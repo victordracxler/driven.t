@@ -29,5 +29,6 @@ export type ViaCEPResponse ={
   ibge: string,
   gia: string,
   ddd: string,
-  siafi: string
+  siafi: string,
+  erro?: string
 }

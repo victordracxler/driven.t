@@ -26,3 +26,20 @@ function validate(schema: ObjectSchema, type: "body" | "params") {
 }
 
 type ValidationMiddleware = (req: Request, res: Response, next: NextFunction)=> void;
+
+export function validateCEP(req: Request, res: Response, next: NextFunction){
+  const cep: string = req.params.cep;
+
+  if(cep.length !== 8){
+    return res.sendStatus(400)
+  }
+  console.log('cep',cep)
+
+  
+
+  if(Number.isNaN(cep)){
+    return res.sendStatus(400)
+  }
+
+  next()
+}

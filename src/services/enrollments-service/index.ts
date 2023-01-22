@@ -6,14 +6,14 @@ import { exclude } from "@/utils/prisma-utils";
 import { Address, Enrollment } from "@prisma/client";
 import { ViaCEPAddress, ViaCEPResponse } from "@/protocols";
 
-async function getAddressFromCEP(cep: string) {
+async function getAddressFromCEP(cep: string): Promise<ViaCEPResponse> {
   const result = await request.get(`https://viacep.com.br/ws/${cep}/json/`);
 
   if (!result.data) {
     throw notFoundError();
   }
 
-  return result.data as ViaCEPResponse
+  return result.data
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
@@ -45,6 +45,10 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const address = getAddressForUpsert(params.address);
 
   //TODO - Verificar se o CEP é válido
+  const result = await getAddressFromCEP(address.cep)
+  if(result.erro){
+    throw notFoundError();
+  }
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, "userId"));
 
   await addressRepository.upsert(newEnrollment.id, address, address);
